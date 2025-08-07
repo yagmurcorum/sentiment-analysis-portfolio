@@ -1,6 +1,14 @@
 import streamlit as st
 import requests
 import time
+import os
+import subprocess
+import sys
+
+# Vercel için gerekli
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8501))
+    subprocess.run([sys.executable, "-m", "streamlit", "run", "app.py", "--server.port", str(port), "--server.address", "0.0.0.0"])
 
 # Sayfa konfigürasyonu
 st.set_page_config(
