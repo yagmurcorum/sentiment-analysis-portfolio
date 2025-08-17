@@ -69,7 +69,7 @@ with col1:
     st.title(" Sentiment Analysis AI")
     st.write("📝 Enter a sentence in English to predict its sentiment:")
 
-    # Metin giriş alanı - session state ile
+    # Text input field with session state
     text = st.text_area(
         "✍️ Your Text", 
         value=st.session_state.get('example_text', ''),
