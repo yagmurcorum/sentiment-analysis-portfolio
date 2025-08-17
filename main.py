@@ -5,12 +5,18 @@ import re
 
 app = FastAPI(title="Sentiment Analysis API", version="1.0.0")
 
-# Sentiment analysis modelini yükle
-sentiment_analyzer = pipeline(
-    "sentiment-analysis",
-    model="cardiffnlp/twitter-roberta-base-sentiment-latest",
-    return_all_scores=True
-)
+# Use lazy loading so that large model initialization does not block requests.
+sentiment_analyzer = None
+
+def get_sentiment_analyzer():
+    global sentiment_analyzer
+    if sentiment_analyzer is None:
+        sentiment_analyzer = pipeline(
+            "sentiment-analysis",
+            model="cardiffnlp/twitter-roberta-base-sentiment-latest",
+            return_all_scores=True
+        )
+    return sentiment_analyzer
 
 class TextRequest(BaseModel):
     text: str = Field(..., min_length=3, max_length=500, description="English sentence to analyze")
@@ -21,15 +27,16 @@ def read_root():
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy"}
+    # Health endpoint independent from the model; always responds quickly
+    return {"status": "ok"}
 
 @app.post("/analyze")
 def analyze_sentiment(request: TextRequest):
-    # Boşluklardan oluşan veya boş metin kontrolü
+    # Reject empty or whitespace-only text
     if not request.text.strip():
         raise HTTPException(status_code=400, detail="Text cannot be empty.")
     
-    # Anlamsız metin kontrolü (sadece noktalama, tek harf vs.)
+    # Reject meaningless text (only punctuation, single character, etc.)
     cleaned = re.sub(r'[^A-Za-z0-9]', '', request.text)
     if not cleaned or len(cleaned) < 2:
         raise HTTPException(
@@ -37,8 +44,9 @@ def analyze_sentiment(request: TextRequest):
             detail="Please enter a meaningful sentence, not just a single character or punctuation."
         )
 
-    # Model ile analiz
-    results = sentiment_analyzer(request.text)
+    # Lazily load the model when needed and run inference
+    analyzer = get_sentiment_analyzer()
+    results = analyzer(request.text)
     best_sentiment = max(results[0], key=lambda x: x['score'])
 
     return {
