@@ -5,7 +5,7 @@ import re
 
 app = FastAPI(title="Sentiment Analysis API", version="1.0.0")
 
-# Sentiment analysis modelini yükle
+# Load the sentiment analysis model
 sentiment_analyzer = pipeline(
     "sentiment-analysis",
     model="cardiffnlp/twitter-roberta-base-sentiment-latest",
@@ -25,11 +25,11 @@ def health_check():
 
 @app.post("/analyze")
 def analyze_sentiment(request: TextRequest):
-    # Boşluklardan oluşan veya boş metin kontrolü
+    # Check for empty or whitespace-only input
     if not request.text.strip():
         raise HTTPException(status_code=400, detail="Text cannot be empty.")
     
-    # Anlamsız metin kontrolü (sadece noktalama, tek harf vs.)
+    # Validate nonsense input (punctuation-only, single letters, etc.)
     cleaned = re.sub(r'[^A-Za-z0-9]', '', request.text)
     if not cleaned or len(cleaned) < 2:
         raise HTTPException(
@@ -37,7 +37,7 @@ def analyze_sentiment(request: TextRequest):
             detail="Please enter a meaningful sentence, not just a single character or punctuation."
         )
 
-    # Model ile analiz
+    # Run analysis with the model
     results = sentiment_analyzer(request.text)
     best_sentiment = max(results[0], key=lambda x: x['score'])
 
