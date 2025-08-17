@@ -33,7 +33,6 @@ AI-powered sentiment analysis web application built with FastAPI and Streamlit.
 
 ## Live Demo
 
-[Coming Soon - Heroku Deployment]
 
 ## Author
 
