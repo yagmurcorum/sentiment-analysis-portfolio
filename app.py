@@ -2,14 +2,14 @@ import streamlit as st
 import requests
 import time
 
-# Sayfa konfigürasyonu
+# Page configuration
 st.set_page_config(
     page_title="Sentiment Analysis AI",
     page_icon="",
     layout="wide"
 )
 
-# CSS ile özel stil
+# Custom styling with CSS
 st.markdown("""
 <style>
     .main {
@@ -62,7 +62,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Ana içerik - İki sütunlu düzen
+# Main content – Two-column layout
 col1, col2 = st.columns([2, 1])
 
 with col1:
@@ -78,7 +78,7 @@ with col1:
         key="text_input"
     )
 
-    # Analiz butonu
+    # Analyze button
     if st.button("🔍 Analyze Sentiment", type="primary"):
         if text.strip() == "":
             st.markdown('<div class="warning-box">⚠️ Please enter some text.</div>', unsafe_allow_html=True)
@@ -92,11 +92,11 @@ with col1:
                 if response.status_code == 200:
                     result = response.json()
                     
-                    # Sonuçları göster
+                    # Display results
                     sentiment = result['sentiment']
                     confidence = result['confidence']
                     
-                    # Emoji ile sentiment göster
+                    # Display sentiment with emoji
                     sentiment_emoji = {
                         'positive': '😊',
                         'negative': '😞', 
