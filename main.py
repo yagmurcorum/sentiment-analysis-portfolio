@@ -36,7 +36,7 @@ def analyze_sentiment(request: TextRequest):
     if not request.text.strip():
         raise HTTPException(status_code=400, detail="Text cannot be empty.")
     
-    # Reject meaningless text (only punctuation, single character, etc.)
+    # Reject meaningless text (punctuation-only, single letters, etc.)
     cleaned = re.sub(r'[^A-Za-z0-9]', '', request.text)
     if not cleaned or len(cleaned) < 2:
         raise HTTPException(
