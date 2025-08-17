@@ -1,24 +1,24 @@
-# Python 3.9 slim imajını kullan
+# Use Python 3.9 slim image
 FROM python:3.9-slim
 
-# Çalışma dizinini belirle
+# Set working directory
 WORKDIR /app
 
-# Gerekli dosyaları kopyala
+# Copy necessary files
 COPY requirements.txt .
 COPY main.py .
 COPY app.py .
 
-# Sistem bağımlılıklarını kur
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# Python kütüphanelerini kur
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Port 8000'i aç
+# Expose port 8000
 EXPOSE 8000
 
-# Uygulamayı başlat
+# Start the application
 CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
